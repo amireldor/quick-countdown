@@ -15,7 +15,10 @@ class ID(object):
 
 class CountdownTimer(wx.Timer):
     """A timer with a seconds_left property indicating a countdown operation.
-    Call the `Update()` method each iteration and check for `HasEnded()`."""
+    Call the `Update()` method each iteration and check for `HasEnded()`.
+
+    This is not complete as wx.Timer can also be called with some `Notify()`
+    functionality but I don't know."""
 
     def __init__(self, parent, id=wx.ID_ANY, seconds=0):
         wx.Timer.__init__(self, parent, id)
