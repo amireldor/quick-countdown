@@ -1,0 +1,34 @@
+ - main dialog
+ - add timer dialog? (nah!)
+ - first-run help and show help again button
+ - quickly add timer with some textbox and silly string parsing?
+ - countdown OR end-at
+ - small current-time clock
+ - hotkey AND/OR:
+ - Alt+F2 'quick-countdown' will open the window (only one instance?)
+ - Multiple windows for differnet countdowns???
+ - sort timers asc/desc:
+   * by time of adding
+   * by time remaining
+ - Nice icon :)
+
+on/off settings:
+----------------
+
+ - always on top
+ - visual notifications (libnotify?, what about windows?)
+ - sound notification
+ - system tray
+ - system tray with icon flashes
+
+use cases
+---------
+
+### Case 1 ###
+
+ * I play War Commander
+ * Tech research ends in 4 hours, tank building in 20 minutes
+ * I use hotkey to open the main dialog
+ * I enter nice "4h tech" hit return
+ * I enter nice "20m tank" hit return
+ * I have timers
