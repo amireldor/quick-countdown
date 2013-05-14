@@ -14,16 +14,12 @@ class ID(object):
     TIMER = 1000
 
 class CountdownTimer(wx.Timer):
-    """A timer with all kinds of interesting stuff for our Quick-Countdown application"""
+    """A timer with a seconds_left property indicating a countdown operation.
+    Call the `Update()` method each iteration and check for `HasEnded()`."""
 
-    def __init__(self, parent, id=wx.ID_ANY, message='', seconds=0):
+    def __init__(self, parent, id=wx.ID_ANY, seconds=0):
         wx.Timer.__init__(self, parent, id)
-
-        self.message = message
         self.seconds_left = seconds
-
-    def GetMessage(self):
-        return self.message
 
     def GetSecondsLeft(self):
         return self.seconds_left
@@ -38,6 +34,20 @@ class CountdownTimer(wx.Timer):
             return True
 
         return False
+
+class MyCountdownTimer(CountdownTimer):
+    """A countdown timer with all kinds of interesting stuff for our Quick-Countdown application.
+    It has a `message` property for example!"""
+
+    def __init__(self, parent, id=wx.ID_ANY, seconds=0, message=''):
+        CountdownTimer.__init__(self, parent, id, seconds)
+        self.message = message
+
+    def GetMessage(self):
+        return self.message
+
+    def SetMessage(self, message):
+        self.message = message
 
 class QuickCountdownFrame(wx.Frame):
 
@@ -102,7 +112,7 @@ class QuickCountdownFrame(wx.Frame):
         message = entered_text
 
         # create new timer
-        countdown_timer = CountdownTimer(self, id=ID.TIMER, message=message, seconds=3)
+        countdown_timer = MyCountdownTimer(self, id=ID.TIMER, message=message, seconds=3)
         self.timers.append(countdown_timer)
         self.Bind(wx.EVT_TIMER, self.OnTimer, countdown_timer)
         countdown_timer.Start()
