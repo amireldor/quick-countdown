@@ -70,6 +70,14 @@ def main():
     print 'Hello!'
 
     app = wx.App()
+
+    # should this be called before `app = wx.App()`?
+    single_checker  = wx.SingleInstanceChecker(name='quick-countdown-%s' % (wx.GetUserId()))
+    if single_checker.IsAnotherRunning():
+        print 'Another instance running (will probably implement a flag to allow multiple instances later)'
+        # TODO: focus on other instance here
+        exit()
+
     main_frame = QuickCountdownFrame()
     main_frame.Show()
     app.MainLoop()
