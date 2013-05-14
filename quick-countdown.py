@@ -13,7 +13,7 @@ def ParseTimerText(entered_text):
         'Cat jumps 30s'
         '12h cat is 30h old' # 12 hours and not 30 coz '30h' comes after '12h' and thus has less importance
         '1d 2h 20m food is ready'
-'1 day 2 minutes 30s cat is dog'
+        '1 day 2 minutes 30s cat is dog'
 
     """
     seconds = 0
@@ -33,29 +33,35 @@ def ParseTimerText(entered_text):
     for x in parts:
 
         try:
+            # does it start with '0'?
+            if x[0] == '0':
+                raise ValueError
+                # TODO: we can probably add `x[0] == '-'` here and remove `number <= 0` later,
+                # but need to see how it works with the code inside ValueError
+
             # is it an integer?
             number = int(x)
 
-            if remember_number is not None or number <= 0:
-                """we already had a number, and we've found another number now!
-                so the previous number must have been part of the message.
-
-                 - OR -
-
-                we found a non-positive number, e.g. "-20". we can't count 'minus' something,
-                so this must be part of the message."""
-                message.append(remember_number)
+            if number <= 0:
+                """negative numbers are considered part of the message"""
+                message.append(x)
             else:
-                """we did not remember any number, this is the first lonely number we see.
-                let's remember it for next iteration"""
-                #remember_number = x
-                pass
-            remember_number = number
+                if remember_number is not None:
+                    """we already had a number, and we've found another number now!
+                    so the previous number must have been part of the message."""
+                    message.append(unicode(remember_number))
+                else:
+                    """we did not remember any number, this is the first lonely number we see.
+                    let's remember it for next iteration"""
+                    #remember_number = x
+                    pass
+                remember_number = number
 
         except ValueError:
             # it's not parsed as a pure integer, so check if it's like "hours" or "3s"
 
             interval = None
+            value = None
 
             lower = x.lower()
             if lower.startswith('second'):
@@ -72,32 +78,61 @@ def ParseTimerText(entered_text):
                 matches = digits_letter_pattern.match(x)
                 if matches:
                     value = int(matches.group(1))
+                    if value <= 0:
+                        value = None
                     interval = matches.group(2)[0].lower()
-                else:
-                    message.append(x)
+                #else:
+                #    message.append(x)
             else:
                 # we've found "second" or "minutes", use the remembered number as value
                 if remember_number is not None:
                     value = remember_number
                     remember_number = None
-                else:
+                #else:
+                #    message.append(x)
+
+            if value is None:
+                """we did not find any value to add so far,
+                not in a "20m" or a remember_number of "20" and x of "minutes",
+                so just add the `x` to the message"""
+                if remember_number is not None:
+                    """we had a pure number before `x`, so, add it as well"""
+                    message.append(unicode(remember_number))
+                    remember_number = None
+                message.append(x)
+            else:
+                """we have a value, and we have an interval. all that is left is to assign them
+                to the relevant variables, if that variable was not already set"""
+                changed = False
+                if interval == 's' and seconds == 0:
+                    seconds = value
+                    changed = True
+                elif interval == 'm' and minutes == 0:
+                    minutes = value
+                    changed = True
+                elif interval == 'h' and hours == 0:
+                    hours = value
+                    changed = True
+                elif interval == 'd' and days == 0:
+                    days = value
+                    changed = True
+
+                if not changed:
+                    """hmm, we didn't change a thing,
+                    e.g. `seconds` was already set to "10" and we met something like "32 seconds" or "10s".
+                    because we give precedence to the first time values in the input,
+                    we add the current string we met to `message`"""
+                    if remember_number is not None:
+                        """we had a pure number before `x`, so, add it as well"""
+                        message.append(unicode(remember_number))
+                        remember_number = None
                     message.append(x)
 
-            if interval == 's' and seconds == 0:
-                seconds = value
-            elif interval == 'm' and minutes == 0:
-                minutes = value
-            elif interval == 'h' and hours == 0:
-                hours = value
-            elif interval == 'd' and days == 0:
-                days = value
 
-            print value, interval
+    if remember_number is not None:
+        """this is for the case there's a number as the last part of the input string"""
+        message.append(unicode(remember_number))
 
-    #if remember_number is not None:
-    #    message.append(remember_number)
-
-    print seconds, minutes, hours, days
     seconds = seconds + MINUTE*minutes + HOUR*hours + DAY*days
     message = ' '.join(message)
 
