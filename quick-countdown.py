@@ -11,6 +11,31 @@ class ID(object):
     BUTTON_SETTINGS = 5
     BUTTON_HELP = 6
     BUTTON_ADD = 7
+    TIMER = 1000
+
+class MyTimer(wx.Timer):
+    """A timer with all kinds of interesting stuff for our Quick-Countdown application"""
+
+    def __init__(self, parent, id=wx.ID_ANY, message='', seconds_remaining=0):
+        wx.Timer.__init__(self, parent, id)
+
+        self.message = message
+        self.seconds_remaining = seconds_remaining
+
+    def GetMessage(self):
+        return self.message
+
+    def GetSecondsRemaining(self):
+        return self.seconds_remaining
+
+    def Update(self):
+        """Decrease one second and return False is should not update anymore.
+        Return True if the timer should keep going"""
+        self.seconds_remaining -= 1
+        if self.seconds_remaining <= 0:
+            return False
+
+        return True
 
 class QuickCountdownFrame(wx.Frame):
 
@@ -21,11 +46,10 @@ class QuickCountdownFrame(wx.Frame):
     def __init__(self):
         wx.Frame.__init__(self, None, title='Quick Countdown', size=self.DEFAULT_SIZE)
 
-        self.Bind(wx.EVT_CLOSE, self.OnClose)
-
         panel = wx.Panel(self)
+        self.timers = []
 
-        self.textctrl_add = wx.TextCtrl(panel, ID.TEXTCTRL_ADD)
+        self.textctrl_add = wx.TextCtrl(panel, ID.TEXTCTRL_ADD, style=wx.TE_PROCESS_ENTER)
         self.button_add = wx.Button(panel, ID.BUTTON_ADD, 'Add')
         self.radiobox_sort_by = wx.RadioBox(panel, ID.RADIOBOX_SORT_BY, label="Sort by", choices=['Time', 'Added'], style=wx.RA_SPECIFY_COLS)
         self.radiobox_sort_order = wx.RadioBox(panel, ID.RADIOBOX_SORT_ORDER, label="Sort order", choices=['Asc', 'Desc'], style=wx.RA_SPECIFY_COLS)
@@ -63,8 +87,31 @@ class QuickCountdownFrame(wx.Frame):
 
         self.textctrl_add.SetFocus()
 
+        self.Bind(wx.EVT_CLOSE, self.OnClose)
+        self.Bind(wx.EVT_TEXT_ENTER, self.OnTextAddEnter, id=ID.TEXTCTRL_ADD)
+        self.Bind(wx.EVT_BUTTON, self.OnTextAddEnter, id=ID.BUTTON_ADD)
+
     def OnClose(self, event):
         self.Destroy()
+
+    def OnTextAddEnter(self, event):
+        entered_text =  self.textctrl_add.GetValue()
+
+        message = entered_text
+
+        # create new timer
+        timer = MyTimer(self, id=ID.TIMER, message=message, seconds_remaining=3)
+        self.timers.append(timer)
+        self.Bind(wx.EVT_TIMER, self.OnTimer, timer)
+        timer.Start(1000)
+
+    def OnTimer(self, event):
+        timer = event.GetEventObject()
+        print timer.GetMessage()
+        keep_timer =  timer.Update()
+        if not keep_timer:
+            self.timers.remove(timer)
+            del timer
 
 def main():
     print 'Hello!'
