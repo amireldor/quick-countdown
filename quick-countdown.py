@@ -1,6 +1,109 @@
 #!/usr/bin/env python
 
 import wx
+import re
+
+def ParseTimerText(entered_text):
+    """Parse text like '3h tank built' and return (seconds, message) with the parsed values.
+
+    Examples for input:
+
+        '29m Singing bowl' # m for minutes
+        'Singing 2Days bowl'
+        'Cat jumps 30s'
+        '12h cat is 30h old' # 12 hours and not 30 coz '30h' comes after '12h' and thus has less importance
+        '1d 2h 20m food is ready'
+'1 day 2 minutes 30s cat is dog'
+
+    """
+    seconds = 0
+    minutes = 0
+    hours = 0
+    days = 0
+    message = []
+
+    SECOND = 1
+    MINUTE = 60 * SECOND
+    HOUR = 60 * MINUTE
+    DAY = 24 * HOUR
+
+    parts = entered_text.split()
+    digits_letter_pattern = re.compile('([\d]+)([dhms])', re.IGNORECASE)
+    remember_number = None
+    for x in parts:
+
+        try:
+            # is it an integer?
+            number = int(x)
+
+            if remember_number is not None or number <= 0:
+                """we already had a number, and we've found another number now!
+                so the previous number must have been part of the message.
+
+                 - OR -
+
+                we found a non-positive number, e.g. "-20". we can't count 'minus' something,
+                so this must be part of the message."""
+                message.append(remember_number)
+            else:
+                """we did not remember any number, this is the first lonely number we see.
+                let's remember it for next iteration"""
+                #remember_number = x
+                pass
+            remember_number = number
+
+        except ValueError:
+            # it's not parsed as a pure integer, so check if it's like "hours" or "3s"
+
+            interval = None
+
+            lower = x.lower()
+            if lower.startswith('second'):
+                interval = 's'
+            elif lower.startswith('minute'):
+                interval = 'm'
+            elif lower.startswith('hour'):
+                interval = 'h'
+            elif lower.startswith('day'):
+                interval = 'd'
+
+            if interval is None:
+                # we did not find "second" or "minutes", looks for the regex pattern
+                matches = digits_letter_pattern.match(x)
+                if matches:
+                    value = int(matches.group(1))
+                    interval = matches.group(2)[0].lower()
+                else:
+                    message.append(x)
+            else:
+                # we've found "second" or "minutes", use the remembered number as value
+                if remember_number is not None:
+                    value = remember_number
+                    remember_number = None
+                else:
+                    message.append(x)
+
+            if interval == 's' and seconds == 0:
+                seconds = value
+            elif interval == 'm' and minutes == 0:
+                minutes = value
+            elif interval == 'h' and hours == 0:
+                hours = value
+            elif interval == 'd' and days == 0:
+                days = value
+
+            print value, interval
+
+    #if remember_number is not None:
+    #    message.append(remember_number)
+
+    print seconds, minutes, hours, days
+    seconds = seconds + MINUTE*minutes + HOUR*hours + DAY*days
+    message = ' '.join(message)
+
+    print 'seconds:', seconds
+    print 'message:', message
+    return seconds, message
 
 # TODO: consider moving inside QuickCountdownFrame?
 class ID(object):
@@ -112,7 +215,7 @@ class QuickCountdownFrame(wx.Frame):
     def OnTextAddEnter(self, event):
         entered_text =  self.textctrl_add.GetValue()
 
-        message = entered_text
+        seconds, message = ParseTimerText(entered_text)
 
         # create new timer
         countdown_timer = MyCountdownTimer(self, id=ID.TIMER, message=message, seconds=3)
