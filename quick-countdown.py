@@ -13,29 +13,31 @@ class ID(object):
     BUTTON_ADD = 7
     TIMER = 1000
 
-class MyTimer(wx.Timer):
+class CountdownTimer(wx.Timer):
     """A timer with all kinds of interesting stuff for our Quick-Countdown application"""
 
-    def __init__(self, parent, id=wx.ID_ANY, message='', seconds_remaining=0):
+    def __init__(self, parent, id=wx.ID_ANY, message='', seconds=0):
         wx.Timer.__init__(self, parent, id)
 
         self.message = message
-        self.seconds_remaining = seconds_remaining
+        self.seconds_left = seconds
 
     def GetMessage(self):
         return self.message
 
-    def GetSecondsRemaining(self):
-        return self.seconds_remaining
+    def GetSecondsLeft(self):
+        return self.seconds_left
 
     def Update(self):
-        """Decrease one second and return False is should not update anymore.
-        Return True if the timer should keep going"""
-        self.seconds_remaining -= 1
-        if self.seconds_remaining <= 0:
-            return False
+        """Decrease one second and return whether the countdown ended.""" 
+        self.seconds_left -= 1
+        return self.HasEnded()
 
-        return True
+    def HasEnded(self):
+        if self.seconds_left <= 0:
+            return True
+
+        return False
 
 class QuickCountdownFrame(wx.Frame):
 
@@ -100,16 +102,16 @@ class QuickCountdownFrame(wx.Frame):
         message = entered_text
 
         # create new timer
-        timer = MyTimer(self, id=ID.TIMER, message=message, seconds_remaining=3)
-        self.timers.append(timer)
-        self.Bind(wx.EVT_TIMER, self.OnTimer, timer)
-        timer.Start(1000)
+        countdown_timer = CountdownTimer(self, id=ID.TIMER, message=message, seconds=3)
+        self.timers.append(countdown_timer)
+        self.Bind(wx.EVT_TIMER, self.OnTimer, countdown_timer)
+        countdown_timer.Start()
 
     def OnTimer(self, event):
         timer = event.GetEventObject()
         print timer.GetMessage()
-        keep_timer =  timer.Update()
-        if not keep_timer:
+        timer.Update()
+        if timer.HasEnded():
             self.timers.remove(timer)
             del timer
 
