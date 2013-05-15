@@ -253,7 +253,7 @@ class QuickCountdownFrame(wx.Frame):
         seconds, message = ParseTimerText(entered_text)
 
         # create new timer
-        countdown_timer = MyCountdownTimer(self, id=ID.TIMER, message=message, seconds=3)
+        countdown_timer = MyCountdownTimer(self, id=ID.TIMER, message=message, seconds=seconds)
         self.timers.append(countdown_timer)
         self.Bind(wx.EVT_TIMER, self.OnTimer, countdown_timer)
         countdown_timer.Start()
