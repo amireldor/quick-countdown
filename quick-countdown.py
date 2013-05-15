@@ -322,6 +322,8 @@ class QuickCountdownFrame(wx.Frame):
         timer = event.GetEventObject()
         if not timer.HasEnded():
             timer.Update()
+        else:
+            timer.Stop()
 
         #if timer.HasEnded():
         #    self.timers.remove(timer)
