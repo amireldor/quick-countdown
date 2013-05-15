@@ -1,3 +1,5 @@
  - Use i18n stuff
  - Make beautiful MVC + Observer for separation of sort checkboxes, the timers
    list, and actual chosen sorting methods
+ - I think the timers list should be not a wx.ListBox (or a subclass of it).
+   Maybe a custom control with some amazing stuff...
