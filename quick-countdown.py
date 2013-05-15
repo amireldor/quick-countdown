@@ -136,8 +136,6 @@ def ParseTimerText(entered_text):
     seconds = seconds + MINUTE*minutes + HOUR*hours + DAY*days
     message = ' '.join(message)
 
-    print 'seconds:', seconds
-    print 'message:', message
     return seconds, message
 
 # TODO: consider moving inside QuickCountdownFrame?
@@ -273,7 +271,6 @@ class QuickCountdownFrame(wx.Frame):
         self.list_timers.UpdateMyList()
 
         timer = event.GetEventObject()
-        print timer.GetMessage()
         timer.Update()
         if timer.HasEnded():
             self.timers.remove(timer)
