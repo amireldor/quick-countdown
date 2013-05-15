@@ -1,0 +1,6 @@
+#!/usr/bin/env python
+
+import quickcountdown
+
+if __name__ == '__main__':
+	quickcountdown.main()
