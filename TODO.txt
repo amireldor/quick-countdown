@@ -1,1 +1,3 @@
-Use i18n stuff
+ - Use i18n stuff
+ - Make beautiful MVC + Observer for separation of sort checkboxes, the timers
+   list, and actual chosen sorting methods
