@@ -226,11 +226,13 @@ class MyTimersList(wx.ListBox):
             items = [ "%s - %s" % (x.GetSecondsLeft(), x.GetMessage()) for x in self.timers ]
             if self.sort_order == self.SORT_ORDER.DESC:
                 items.reverse()
-        elif self.sort_by == self.SORT_BY.TIMER:
+        elif self.sort_by == self.SORT_BY.TIME:
             # TODO: implement
             raise NotImplementedError
 
+        previous_selection = self.GetSelection()
         self.Set(items=items)
+        self.SetSelection(previous_selection)
 
 
     def SetSortOrder(self, order):
@@ -320,6 +322,9 @@ class QuickCountdownFrame(wx.Frame):
         self.Bind(wx.EVT_TIMER, self.OnTimer, countdown_timer)
         countdown_timer.Start()
 
+        self.textctrl_add.Clear()
+        self.list_timers.UpdateMyList()
+
     def OnTimer(self, event):
         self.list_timers.UpdateMyList()
 
@@ -338,12 +343,14 @@ class QuickCountdownFrame(wx.Frame):
         label = self.radiobox_sort_order.GetItemLabel(selection)
 
         self.list_timers.SetSortOrder(self.SORT_ORDER[label])
+        self.list_timers.UpdateMyList()
 
     def OnRadioBoxSortBy(self, event):
         selection = self.radiobox_sort_by.GetSelection()
         label = self.radiobox_sort_by.GetItemLabel(selection)
 
         self.list_timers.SetSortBy(self.SORT_BY[label])
+        self.list_timers.UpdateMyList()
 
 def main():
     print 'Hello!'
