@@ -190,6 +190,17 @@ class MyCountdownTimer(CountdownTimer):
     def SetMessage(self, message):
         self.message = message
 
+class MyTimersList(wx.ListBox):
+    """A list box that shows the MyCountdownTimer()s we give it with the `timers` parameter on __init__"""
+
+    def __init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize, style=0, validator=wx.DefaultValidator, name="listBox", timers=None):
+        wx.ListBox.__init__(self, parent, id=id, pos=pos, size=size, style=style, validator=validator, name=name, choices=[])
+        self.timers = timers
+
+    def UpdateMyList(self):
+        items = [ "%s - %s" % (x.GetSecondsLeft(), x.GetMessage()) for x in self.timers ]
+        self.Set(items=items)
+
 class QuickCountdownFrame(wx.Frame):
 
     COMMON_SIZER_BORDER = 5
@@ -206,7 +217,7 @@ class QuickCountdownFrame(wx.Frame):
         self.button_add = wx.Button(panel, ID.BUTTON_ADD, 'Add')
         self.radiobox_sort_by = wx.RadioBox(panel, ID.RADIOBOX_SORT_BY, label="Sort by", choices=['Time', 'Added'], style=wx.RA_SPECIFY_COLS)
         self.radiobox_sort_order = wx.RadioBox(panel, ID.RADIOBOX_SORT_ORDER, label="Sort order", choices=['Asc', 'Desc'], style=wx.RA_SPECIFY_COLS)
-        self.list_timers = wx.ListBox(panel, ID.LIST_TIMERS)
+        self.list_timers = MyTimersList(panel, ID.LIST_TIMERS, timers=self.timers)
         self.button_settings = wx.Button(panel, ID.BUTTON_SETTINGS, 'Settings')
         self.button_help = wx.Button(panel, ID.BUTTON_HELP, 'Help')
 
@@ -259,6 +270,8 @@ class QuickCountdownFrame(wx.Frame):
         countdown_timer.Start()
 
     def OnTimer(self, event):
+        self.list_timers.UpdateMyList()
+
         timer = event.GetEventObject()
         print timer.GetMessage()
         timer.Update()
