@@ -225,10 +225,13 @@ class MyTimersList(wx.ListBox):
         if self.sort_by == self.SORT_BY.ADDED:
             items = [ "%s - %s" % (x.GetSecondsLeft(), x.GetMessage()) for x in self.timers ]
             if self.sort_order == self.SORT_ORDER.DESC:
-                print 'reverse'
                 items.reverse()
+        elif self.sort_by == self.SORT_BY.TIMER:
+            # TODO: implement
+            raise NotImplementedError
 
         self.Set(items=items)
+
 
     def SetSortOrder(self, order):
         if order not in self.SORT_ORDER():
@@ -247,8 +250,8 @@ class QuickCountdownFrame(wx.Frame):
     DEFAULT_SIZE = (350, 500)
 
     # Widgets labels TO MyTimersList sort ID values
-    SORT_BY = { 'Added': MyTimersList.SORT_BY.ADDED, 'Time': MyTimersList.SORT_BY.TIME }
-    SORT_ORDER = { 'Asc': MyTimersList.SORT_ORDER.ASC, 'Desc': MyTimersList.SORT_ORDER.DESC }
+    SORT_BY = { 'Added': MyTimersList.SORT_BY.ADDED, 'Time': MyTimersList.SORT_BY.TIME, }
+    SORT_ORDER = { 'Asc': MyTimersList.SORT_ORDER.ASC, 'Desc': MyTimersList.SORT_ORDER.DESC, }
 
     def __init__(self):
         wx.Frame.__init__(self, None, title='Quick Countdown', size=self.DEFAULT_SIZE)
@@ -256,11 +259,14 @@ class QuickCountdownFrame(wx.Frame):
         panel = wx.Panel(self)
         self.timers = []
 
+        sort_by_choices = self.SORT_BY.keys()
+        sort_order_choices = self.SORT_ORDER.keys()
+
         self.textctrl_add = wx.TextCtrl(panel, ID.TEXTCTRL_ADD, style=wx.TE_PROCESS_ENTER)
         self.button_add = wx.Button(panel, ID.BUTTON_ADD, 'Add')
-        self.radiobox_sort_by = wx.RadioBox(panel, ID.RADIOBOX_SORT_BY, label="Sort by", choices=self.SORT_BY.keys(), style=wx.RA_SPECIFY_COLS)
-        self.radiobox_sort_order = wx.RadioBox(panel, ID.RADIOBOX_SORT_ORDER, label="Sort order", choices=self.SORT_ORDER.keys(), style=wx.RA_SPECIFY_COLS)
-        self.list_timers = MyTimersList(panel, ID.LIST_TIMERS, timers=self.timers, sort_order=MyTimersList.SORT_ORDER.DESC)
+        self.radiobox_sort_by = wx.RadioBox(panel, ID.RADIOBOX_SORT_BY, label="Sort by", choices=sort_by_choices, style=wx.RA_SPECIFY_COLS)
+        self.radiobox_sort_order = wx.RadioBox(panel, ID.RADIOBOX_SORT_ORDER, label="Sort order", choices=sort_order_choices, style=wx.RA_SPECIFY_COLS)
+        self.list_timers = MyTimersList(panel, ID.LIST_TIMERS, timers=self.timers, sort_by=self.SORT_BY[sort_by_choices[0]], sort_order=self.SORT_ORDER[sort_order_choices[0]])
         self.button_settings = wx.Button(panel, ID.BUTTON_SETTINGS, 'Settings')
         self.button_help = wx.Button(panel, ID.BUTTON_HELP, 'Help')
 
