@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import wx
 import re
 
@@ -164,7 +166,7 @@ class CountdownTimer(wx.Timer):
     def Update(self):
         """Decrease one second and return whether the countdown ended.""" 
         self.seconds_left -= 1
-        return self.HasEnded()
+        return False
 
     def HasEnded(self):
         if self.seconds_left <= 0:

@@ -1,16 +1,7 @@
- - main dialog
- - add timer dialog? (nah!)
- - first-run help and show help again button
- - quickly add timer with some textbox and silly string parsing?
- - countdown OR end-at
+ - quickly add timer with some textbox and silly string parsing? (done)
  - small current-time clock
  - hotkey AND/OR:
- - Alt+F2 'quick-countdown' will open the window (only one instance?)
- - Multiple windows for differnet countdowns???
- - sort timers asc/desc:
-   * by time of adding
-   * by time remaining
- - Nice icon :)
+ - Nice icon
 
 on/off settings:
 ----------------
