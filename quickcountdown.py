@@ -20,7 +20,7 @@ def ParseTimerText(entered_text):
     minutes = 0
     hours = 0
     days = 0
-    message = []
+    message = ['no message sir/madam!']
 
     SECOND = 1
     MINUTE = 60 * SECOND
